@@ -28,6 +28,8 @@ function App() {
   const [isInputExpanded, setIsInputExpanded] = useState(false);
   const [isBaziInputExpanded, setIsBaziInputExpanded] = useState(false);
 
+
+  
   // 显示所有牌供用户选择
   const showCardSelection = () => {
     setShowAllCards(true);
