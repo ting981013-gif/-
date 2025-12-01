@@ -628,15 +628,6 @@ function App() {
         {activeTab === 'bazi' && (
           <BaziResult reading={baziReading} isLoading={isBaziLoading} />
         )}
-
-        {/* 底部装饰 */}
-        {activeTab === 'tarot' && (
-          <div className="text-center mt-16">
-            <p className="text-gray-800 text-sm">
-              ✨ 塔罗牌解读仅供参考，请以积极的心态面对生活 ✨
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
