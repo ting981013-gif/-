@@ -90,6 +90,8 @@ function App() {
     });
   };
 
+  
+
   // 获取AI解读
   const getAIReading = async () => {
     if (drawnCards.length === 0) return;
