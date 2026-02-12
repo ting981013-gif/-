@@ -39,3 +39,11 @@ const BaziResult = ({ reading, isLoading }) => {
 export default BaziResult;
 
 
+
+
+
+
+
+
+
+

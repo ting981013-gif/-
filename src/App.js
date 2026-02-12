@@ -28,8 +28,6 @@ function App() {
   const [isInputExpanded, setIsInputExpanded] = useState(false);
   const [isBaziInputExpanded, setIsBaziInputExpanded] = useState(false);
 
-
-  
   // 显示所有牌供用户选择
   const showCardSelection = () => {
     setShowAllCards(true);
@@ -91,8 +89,6 @@ function App() {
       return newSet;
     });
   };
-
-  
 
   // 获取AI解读
   const getAIReading = async () => {
@@ -628,6 +624,13 @@ function App() {
         {activeTab === 'bazi' && (
           <BaziResult reading={baziReading} isLoading={isBaziLoading} />
         )}
+
+        {/* 底部装饰 */}
+        <div className="text-center mt-16">
+          <p className="text-gray-800 text-sm">
+            ✨ 塔罗牌解读仅供参考，请以积极的心态面对生活 ✨
+          </p>
+        </div>
       </div>
     </div>
   );
