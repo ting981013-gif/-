@@ -1,168 +1,143 @@
-const { tarotCards, themes } = require('../../utils/tarotCards');
-const { generateTarotReading } = require('../../utils/aiService');
+const { tarotCards, themes } = require('../../utils/tarotCards.js');
 
 Page({
   data: {
-    themes: themes.map(t => ({
-      ...t,
-      styleStr: `padding: 16rpx 12rpx; border-radius: 16rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6rpx; border: 1rpx solid ${t.id === 'love' ? 'rgba(124, 58, 237, 0.3)' : 'rgba(148, 163, 184, 0.2)'}; background: #ffffff; box-shadow: ${t.id === 'love' ? '0 4rpx 12rpx rgba(124, 58, 237, 0.15)' : '0 2rpx 8rpx rgba(0, 0, 0, 0.05)'}; box-sizing: border-box;`
-    })),
-    selectedThemeId: 'love',
+    themes,
+    selectedThemeId: themes[0]?.id || '',
     emotionText: '',
-    selectedCards: [],
+    allCards: tarotCards,
+    circleCards: [],
     selectedCardIds: [],
-    showAllCards: false,
-    flippedCards: [],
-    readingText: '',
-    loading: false,
-    allTarotCards: tarotCards
+    drawnCards: [],
+    aiReading: ''
   },
 
-  onSelectTheme(e) {
-    const { id } = e.currentTarget.dataset;
-    const themes = this.data.themes.map(t => ({
-      ...t,
-      styleStr: `padding: 16rpx 12rpx; border-radius: 16rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6rpx; border: 1rpx solid ${id === t.id ? 'rgba(124, 58, 237, 0.3)' : 'rgba(148, 163, 184, 0.2)'}; background: #ffffff; box-shadow: ${id === t.id ? '0 4rpx 12rpx rgba(124, 58, 237, 0.15)' : '0 2rpx 8rpx rgba(0, 0, 0, 0.05)'}; box-sizing: border-box;`
-    }));
-    this.setData({
-      selectedThemeId: id,
-      themes
+  onLoad() {
+    this.initCircleCards();
+  },
+
+  // 计算圆形排列坐标（与网页版思路一致）
+  initCircleCards() {
+    const total = tarotCards.length;
+    const radius = 220; // 半径，单位 rpx，适当缩小避免重叠
+    const center = 270; // 圆心坐标
+
+    const circleCards = tarotCards.map((card, index) => {
+      const angle = (index / total) * 2 * Math.PI - Math.PI / 2; // 从顶部开始
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      return {
+        ...card,
+        left: center + x,
+        top: center + y,
+        selectionIndex: 0
+      };
     });
+
+    this.setData({ circleCards });
+  },
+
+  onThemeTap(e) {
+    const id = e.currentTarget.dataset.id;
+    this.setData({ selectedThemeId: id });
   },
 
   onEmotionInput(e) {
-    this.setData({
-      emotionText: e.detail.value.slice(0, 180)
-    });
+    this.setData({ emotionText: e.detail.value });
   },
 
-  onShowCardSelection() {
+  // 根据输入生成塔罗阵（这里主要是重置选择，方便用户重新来过）
+  onGenerateSpread() {
     this.setData({
-      showAllCards: true,
       selectedCardIds: [],
-      selectedCards: [],
-      flippedCards: []
+      drawnCards: [],
+      aiReading: '',
+      circleCards: this.data.circleCards.map(card => ({ ...card, selectionIndex: 0 }))
     });
   },
 
-  onCardSelect(e) {
-    const { id } = e.currentTarget.dataset;
-    const { selectedCardIds } = this.data;
-    
-    if (selectedCardIds.includes(id)) {
-      // 如果已选中，则取消选择
-      this.setData({
-        selectedCardIds: selectedCardIds.filter(cardId => cardId !== id)
-      });
-    } else if (selectedCardIds.length < 3) {
-      // 如果未选中且未选满3张，则添加
-      this.setData({
-        selectedCardIds: [...selectedCardIds, id]
-      });
-    } else {
-      wx.showToast({
-        title: '最多只能选择3张牌',
-        icon: 'none',
-        duration: 2000
-      });
-    }
+  // 完全重置（清空输入和结果）
+  onReset() {
+    this.setData({
+      emotionText: '',
+      selectedCardIds: [],
+      drawnCards: [],
+      aiReading: '',
+      circleCards: this.data.circleCards.map(card => ({ ...card, selectionIndex: 0 }))
+    });
   },
 
-  onConfirmCardSelection() {
-    const { selectedCardIds, allTarotCards } = this.data;
-    
-    if (selectedCardIds.length !== 3) {
+  // 用户在所有牌中手动选择 / 取消选择
+  onCardTap(e) {
+    const id = Number(e.currentTarget.dataset.id);
+    const { selectedCardIds } = this.data;
+    const exists = selectedCardIds.indexOf(id);
+
+    // 已经选中过则取消
+    if (exists !== -1) {
+      const updated = selectedCardIds.filter(itemId => itemId !== id);
+      this.setData({ selectedCardIds: updated });
+      return;
+    }
+
+    // 限制最多 3 张
+    if (selectedCardIds.length >= 3) {
       wx.showToast({
-        title: '请选择3张牌',
-        icon: 'none',
-        duration: 2000
+        title: '最多选择 3 张牌',
+        icon: 'none'
       });
       return;
     }
-    
+
+    const updated = selectedCardIds.concat(id);
+
+    // 重新计算每张牌的选中序号，避免在 WXML 中计算出现 NaN
+    const circleCards = this.data.circleCards.map(card => {
+      const idx = updated.indexOf(card.id);
+      return {
+        ...card,
+        selectionIndex: idx === -1 ? 0 : idx + 1
+      };
+    });
+
+    this.setData({
+      selectedCardIds: updated,
+      circleCards
+    });
+  },
+
+  // 确认选择三张牌后，生成本地解读占位并预留 AI 接口
+  onConfirmSelection() {
+    const { selectedCardIds } = this.data;
+    if (selectedCardIds.length !== 3) {
+      wx.showToast({
+        title: '请先选择 3 张牌',
+        icon: 'none'
+      });
+      return;
+    }
+
     const selected = selectedCardIds.map((cardId, idx) => {
-      const card = allTarotCards.find(c => c.id === cardId);
+      const card = tarotCards.find(c => c.id === cardId);
       return {
         ...card,
         order: idx + 1,
-        reversed: Math.random() < 0.5 // 为选中的牌随机设置正逆位
+        reversed: Math.random() < 0.5
       };
     });
-    
-    this.setData({
-      selectedCards: selected,
-      showAllCards: false,
-      selectedCardIds: [],
-      flippedCards: [] // 重置翻转状态
-    });
-  },
-
-  onCardFlip(e) {
-    const { index } = e.currentTarget.dataset;
-    const { flippedCards } = this.data;
-    const newFlippedCards = [...flippedCards];
-    
-    if (newFlippedCards.includes(index)) {
-      // 如果已翻转，则翻回去
-      newFlippedCards.splice(newFlippedCards.indexOf(index), 1);
-    } else {
-      // 如果未翻转，则翻转
-      newFlippedCards.push(index);
-    }
-    
-    this.setData({
-      flippedCards: newFlippedCards
-    });
-  },
-
-  async onDrawAndAsk() {
-    if (this.data.loading) return;
-
-    const { selectedThemeId, emotionText, selectedCards } = this.data;
-
-    if (selectedCards.length === 0) {
-      wx.showToast({
-        title: '请先选择3张牌',
-        icon: 'none',
-        duration: 2000
-      });
-      return;
-    }
 
     this.setData({
-      loading: true,
-      readingText: ''
+      drawnCards: selected
     });
 
-    wx.showLoading({
-      title: '正在解读中…',
-      mask: true
+    // 这里先生成一个本地文案占位，后面可以改成调用你自己的 AI 接口
+    const names = selected.map(c => `${c.name}${c.reversed ? '(逆位)' : '(正位)'}`).join('、');
+    const reading = `本次解读选中的三张牌为：${names}。\n\n` +
+      '当前为占位文案，用于确认选择流程和展示结构是否符合预期。后续可以在这里对接与你网页版相同的 AI 解读接口，将返回的长文本展示出来。';
+
+    this.setData({
+      aiReading: reading
     });
-
-    try {
-      const text = await generateTarotReading(selectedThemeId, selectedCards, {
-        emotionText,
-        spread: '三张牌',
-        analysisPattern: '现状-阻碍-趋势'
-      });
-
-      this.setData({
-        readingText: text || '暂时没有得到有效的解读结果，请稍后重试。',
-        loading: false
-      });
-    } catch (error) {
-      console.error('AI 解读失败', error);
-      this.setData({
-        loading: false
-      });
-      wx.showToast({
-        title: '解读失败，请稍后重试',
-        icon: 'none',
-        duration: 3000
-      });
-    } finally {
-      wx.hideLoading();
-    }
   }
 });
 

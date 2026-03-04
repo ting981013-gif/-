@@ -1,66 +1,10 @@
 page {
-  background: linear-gradient(135deg, #f8fafc 0%, #e9ecff 100%);
-  color: #1f2937;
-  min-height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  background: #f4f4fb;
+  min-height: 100vh;
 }
 
-.gradient-bg {
-  background: linear-gradient(135deg, #f8fafc 0%, #e9ecff 100%);
-}
-
-.card {
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(16px);
-  border-radius: 24rpx;
-  padding: 24rpx 28rpx;
-  box-shadow: 0 8rpx 32rpx rgba(31, 38, 135, 0.12);
-  border: 1rpx solid rgba(255, 255, 255, 0.8);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #93c5fd, #60a5fa);
-  color: #ffffff;
-  border-radius: 9999rpx;
-  font-weight: 600;
-}
-
-.btn-primary:active {
-  opacity: 0.85;
-}
-
-.tag {
-  border-radius: 9999rpx;
-  padding: 6rpx 16rpx;
-  font-size: 22rpx;
-}
-
-.pill {
-  border-radius: 9999rpx;
-}
-
-.text-muted {
-  color: #6b7280;
-}
-
-.text-soft {
-  color: #374151;
-}
-
-.text-title {
-  font-size: 40rpx;
-  font-weight: 700;
-}
-
-.text-subtitle {
-  font-size: 26rpx;
-  color: #6b7280;
-}
-
-.divider {
-  height: 1rpx;
-  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.6), transparent);
-  margin: 24rpx 0;
+.page {
+  padding: 40rpx 32rpx 60rpx;
 }
 
 

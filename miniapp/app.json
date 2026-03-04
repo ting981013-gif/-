@@ -3,10 +3,9 @@
     "pages/index/index"
   ],
   "window": {
-    "navigationBarTitleText": "AI塔罗占卜",
-    "navigationBarBackgroundColor": "#111827",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#020617",
+    "navigationBarTitleText": "AI 塔罗占卜",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
     "backgroundTextStyle": "light"
   },
   "style": "v2",

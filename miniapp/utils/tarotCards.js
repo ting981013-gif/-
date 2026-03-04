@@ -162,36 +162,36 @@ const themes = [
     id: 'love',
     name: '感情',
     icon: '💕',
-    colorFrom: '#C9D6E8',
-    colorTo: '#C9D6E8'
+    colorFrom: '#fb7185',
+    colorTo: '#f97316'
   },
   {
     id: 'study',
     name: '学业',
     icon: '📚',
-    colorFrom: '#C9D6E8',
-    colorTo: '#C9D6E8'
+    colorFrom: '#38bdf8',
+    colorTo: '#6366f1'
   },
   {
     id: 'work',
     name: '工作',
     icon: '💼',
-    colorFrom: '#C9D6E8',
-    colorTo: '#C9D6E8'
+    colorFrom: '#22c55e',
+    colorTo: '#14b8a6'
   },
   {
     id: 'money',
     name: '财运',
     icon: '💰',
-    colorFrom: '#C9D6E8',
-    colorTo: '#C9D6E8'
+    colorFrom: '#facc15',
+    colorTo: '#fb923c'
   },
   {
     id: 'health',
     name: '健康',
     icon: '🏥',
-    colorFrom: '#C9D6E8',
-    colorTo: '#C9D6E8'
+    colorFrom: '#a855f7',
+    colorTo: '#ec4899'
   }
 ];
 

@@ -88,7 +88,7 @@
   position: relative;
   width: 540rpx;
   height: 540rpx;
-  margin: 132rpx auto 200rpx; /* 加大与下方按钮的间距，大约 +160rpx */
+  margin: 132rpx auto 110rpx; /* 调整为略小的间距：原来 200rpx - 90rpx */
 }
 
 .all-card-selected {
